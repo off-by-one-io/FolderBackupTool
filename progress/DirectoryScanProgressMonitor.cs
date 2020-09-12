@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FolderBackupTool.progress
+namespace FolderBackupTool
 {
     class DirectoryScanProgressMonitor
     {

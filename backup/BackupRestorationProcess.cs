@@ -1,5 +1,4 @@
-﻿using FolderBackupTool.progress;
-using System;
+﻿using System;
 using System.IO;
 
 namespace FolderBackupTool
