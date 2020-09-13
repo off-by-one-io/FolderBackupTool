@@ -25,7 +25,10 @@ namespace FolderBackupTool
 
         private DirectoryEntry ScanDirectory(string scannedDirectory, DirectoryScanProgressMonitor monitor = null)
         {
-            var dirInfo = new FileInfo(scannedDirectory);
+            var dirInfo = new DirectoryInfo(scannedDirectory);
+
+            if (dirInfo.Parent != null && dirInfo.Attributes.HasFlag(FileAttributes.System))
+                return null;
 
             var dirEntry = new DirectoryEntry();
             dirEntry.Name = dirInfo.Name;
@@ -38,8 +41,11 @@ namespace FolderBackupTool
                 try
                 {
                     var fileEntry = this.ScanFile(file, monitor);
-                    fileEntry.ParentDirectory = dirEntry;
-                    dirEntry.Files.Add(fileEntry.Name, fileEntry);
+                    if (fileEntry != null)
+                    {
+                        fileEntry.ParentDirectory = dirEntry;
+                        dirEntry.Files.Add(fileEntry.Name, fileEntry);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -54,8 +60,11 @@ namespace FolderBackupTool
                 try
                 {
                     var childDirectoryEntry = this.ScanDirectory(dir, monitor);
-                    childDirectoryEntry.ParentDirectory = dirEntry;
-                    dirEntry.Directories.Add(childDirectoryEntry.Name, childDirectoryEntry);
+                    if (childDirectoryEntry != null)
+                    {
+                        childDirectoryEntry.ParentDirectory = dirEntry;
+                        dirEntry.Directories.Add(childDirectoryEntry.Name, childDirectoryEntry);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -71,6 +80,10 @@ namespace FolderBackupTool
         private FileEntry ScanFile(string scannedFile, DirectoryScanProgressMonitor monitor = null)
         {
             var fileInfo = new FileInfo(scannedFile);
+
+            if (fileInfo.Attributes.HasFlag(FileAttributes.System))
+                return null;
+
             var fileEntry = new FileEntry();
 
             fileEntry.Name = fileInfo.Name;
